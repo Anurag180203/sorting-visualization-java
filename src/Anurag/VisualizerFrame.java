@@ -1,6 +1,5 @@
 package Anurag;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.BorderLayout;
 
 @SuppressWarnings("serial")
 public class VisualizerFrame extends JFrame {
@@ -30,7 +30,8 @@ public class VisualizerFrame extends JFrame {
 	private final int DEFAULT_SPEED = 20;
 	private final int DEFAULT_SIZE = 100;
 
-	private final String[] Sorts = {"Bubble", "Selection", "Insertion", "Gnome", "Merge", "Radix LSD", "Radix MSD", "Shell", "Quandrix", "Bubble(fast)", "Selection(fast)", "Insertion(fast)", "Gnome(fast)"};
+	private final String[] Sorts = { "Bubble", "Selection", "Insertion", "Gnome", "Merge", "Radix LSD", "Radix MSD",
+			"Shell", "Quandrix", "Bubble(fast)", "Selection(fast)", "Insertion(fast)", "Gnome(fast)" };
 
 	private int sizeModifier;
 
@@ -38,17 +39,18 @@ public class VisualizerFrame extends JFrame {
 	private JPanel arrayWrapper;
 	private JPanel buttonWrapper;
 	private JPanel[] squarePanels;
+	private JLabel[] valueLabels; // Added array for value labels
 	private JButton start;
 	private JComboBox<String> selection;
 	private JSlider speed;
 	private JSlider size;
 	private JLabel speedVal;
 	private JLabel sizeVal;
-	private GridBagConstraints c;
 	private JCheckBox stepped;
+	private GridBagConstraints c;
 
-	public VisualizerFrame(){
-		super("Sorting Visualizer");
+	public VisualizerFrame() {
+		super("VisualSort");
 
 		start = new JButton("Start");
 		buttonWrapper = new JPanel();
@@ -62,12 +64,13 @@ public class VisualizerFrame extends JFrame {
 		stepped = new JCheckBox("Stepped Values");
 		c = new GridBagConstraints();
 
-		for(String s : Sorts) selection.addItem(s);
+		for (String s : Sorts)
+			selection.addItem(s);
 
 		arrayWrapper.setLayout(new GridBagLayout());
 		wrapper.setLayout(new BorderLayout());
 
-		c.insets = new Insets(0,1,0,1);
+		c.insets = new Insets(0, 1, 0, 1);
 		c.anchor = GridBagConstraints.SOUTH;
 
 		start.addActionListener(new ActionListener() {
@@ -119,7 +122,7 @@ public class VisualizerFrame extends JFrame {
 
 		add(wrapper);
 
-		setExtendedState(JFrame.MAXIMIZED_BOTH );
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		addComponentListener(new ComponentListener() {
 
@@ -127,7 +130,7 @@ public class VisualizerFrame extends JFrame {
 			public void componentResized(ComponentEvent e) {
 				// Reset the sizeModifier
 				// 90% of the windows height, divided by the size of the sorted array.
-				sizeModifier = (int) ((getHeight()*0.9)/(squarePanels.length));
+				sizeModifier = (int) ((getHeight() * 0.9) / (squarePanels.length));
 			}
 
 			@Override
@@ -152,53 +155,67 @@ public class VisualizerFrame extends JFrame {
 		setLocationRelativeTo(null);
 	}
 
-	// preDrawArray reinitializes the array of panels that represent the values. They are set based on the size of the window.
-	public void preDrawArray(Integer[] squares){
+	// preDrawArray reinitializes the array of panels that represent the values.
+	// They are set based on the size of the window.
+	public void preDrawArray(Integer[] squares) {
 		squarePanels = new JPanel[SortingVisualizer.sortDataCount];
+		valueLabels = new JLabel[SortingVisualizer.sortDataCount]; // Initialize value labels array
 		arrayWrapper.removeAll();
 		// 90% of the windows height, divided by the size of the sorted array.
-		sizeModifier =  (int) ((getHeight()*0.9)/(squarePanels.length));
-		for(int i = 0; i<SortingVisualizer.sortDataCount; i++){
+		sizeModifier = (int) ((getHeight() * 0.9) / (squarePanels.length));
+		for (int i = 0; i < SortingVisualizer.sortDataCount; i++) {
 			squarePanels[i] = new JPanel();
-			squarePanels[i].setPreferredSize(new Dimension(SortingVisualizer.blockWidth, squares[i]*sizeModifier));
+			squarePanels[i].setPreferredSize(new Dimension(SortingVisualizer.blockWidth, squares[i] * sizeModifier));
 			squarePanels[i].setBackground(Color.blue);
-			arrayWrapper.add(squarePanels[i], c);
+
+			valueLabels[i] = new JLabel(String.valueOf(squares[i])); // Set value label
+			JPanel panelWithLabel = new JPanel(new BorderLayout()); // Panel to contain both square panel and label
+			panelWithLabel.add(valueLabels[i], BorderLayout.NORTH); // Add label above the square panel
+			panelWithLabel.add(squarePanels[i], BorderLayout.CENTER); // Add square panel
+
+			arrayWrapper.add(panelWithLabel, c);
 		}
 		repaint();
 		validate();
 	}
 
-	public void reDrawArray(Integer[] x){
+	public void reDrawArray(Integer[] x) {
 		reDrawArray(x, -1);
 	}
 
-	public void reDrawArray(Integer[] x, int y){
+	public void reDrawArray(Integer[] x, int y) {
 		reDrawArray(x, y, -1);
 	}
 
-	public void reDrawArray(Integer[] x, int y, int z){
+	public void reDrawArray(Integer[] x, int y, int z) {
 		reDrawArray(x, y, z, -1);
 	}
 
-	// reDrawArray does similar to preDrawArray except it does not reinitialize the panel array.
-	public void reDrawArray(Integer[] squares, int working, int comparing, int reading){
+	// reDrawArray does similar to preDrawArray except it does not reinitialize the
+	// panel array.
+	public void reDrawArray(Integer[] squares, int working, int comparing, int reading) {
 		arrayWrapper.removeAll();
-		for(int i = 0; i<squarePanels.length; i++){
+		for (int i = 0; i < squarePanels.length; i++) {
 			squarePanels[i] = new JPanel();
-			squarePanels[i].setPreferredSize(new Dimension(SortingVisualizer.blockWidth, squares[i]*sizeModifier));
-			if (i == working){
+			squarePanels[i].setPreferredSize(new Dimension(SortingVisualizer.blockWidth, squares[i] * sizeModifier));
+			if (i == working) {
 				squarePanels[i].setBackground(Color.green);
-			}else if(i == comparing){
+			} else if (i == comparing) {
 				squarePanels[i].setBackground(Color.red);
-			}else if(i == reading){
+			} else if (i == reading) {
 				squarePanels[i].setBackground(Color.yellow);
-			}else{
+			} else {
 				squarePanels[i].setBackground(Color.blue);
 			}
-			arrayWrapper.add(squarePanels[i], c);
+
+			valueLabels[i] = new JLabel(String.valueOf(squares[i])); // Set value label
+			JPanel panelWithLabel = new JPanel(new BorderLayout()); // Panel to contain both square panel and label
+			panelWithLabel.add(valueLabels[i], BorderLayout.NORTH); // Add label above the square panel
+			panelWithLabel.add(squarePanels[i], BorderLayout.CENTER); // Add square panel
+
+			arrayWrapper.add(panelWithLabel, c);
 		}
 		repaint();
 		validate();
 	}
-
 }
