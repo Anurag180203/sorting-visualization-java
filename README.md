@@ -13,7 +13,7 @@ ___
   - Gnome sort
   - Shell sort
   - Merge sort
-  - Radix sort (MSD and LSD)
+  - Radix sort (LSD)
   
   You are able to change the speed at which the sorts operate as well as the size of the data set.
   
